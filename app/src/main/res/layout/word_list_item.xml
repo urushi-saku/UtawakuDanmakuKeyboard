@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  このファイルは、キーボードの単語リストに表示される
-  各項目（単語一つ分）のレイアウトを定義します。
--->
+<!-- リストの一行分のレイアウトを定義します -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/word_text_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
     android:textSize="18sp"
-    android:textColor="?android:attr/textColorPrimary" />
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?android:attr/selectableItemBackground"/>
