@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  このファイルは、キーボードの全体的なレイアウトを定義します。
+  DanmakuInputMethodService の onCreateInputView() メソッドで読み込まれ、
+  キーボードが表示される際の「見た目」となります。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!--
+      RecyclerView は、大量のデータを効率的にリスト表示するためのUI部品です。
+      ここに、ユーザーが登録した単語（辞書）のリストが表示されます。
+      具体的なリストの各項目の見た目や、実際にどのデータを表示するかは、
+      サービスクラス（DanmakuInputMethodService.kt）と
+      アダプタークラス（今後作成）で設定します。
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/word_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

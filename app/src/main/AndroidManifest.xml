@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  AndroidManifest.xml は、アプリの基本的な特性をAndroidビルドツール、
+  Androidオペレーティングシステム、そしてGoogle Playに説明するためのファイルです。
+  ここでは、アプリのコンポーネント（Activity, Serviceなど）をすべて宣言する必要があります。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.弾幕キーボード">
+
+        <!--
+          MainActivityは、アプリの設定画面です。
+          ユーザーはここから辞書を編集したり、キーボードの設定を変更したりします。
+          LAUNCHERインテントフィルターは、このActivityがアプリのメインの入口であり、
+          ホーム画面のアイコンから起動されることを示します。
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.弾幕キーボード">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          ここからが、カスタムキーボード（IME）のための定義です。
+          <service> タグを使って、InputMethodService を継承したクラスを
+          「サービス」としてシステムに登録します。
+        -->
+        <service
+            android:name=".DanmakuInputMethodService"
+            android:exported="true"
+            <!-- BIND_INPUT_METHOD パーミッションは、このサービスが
+                 システムにバインドされ、入力メソッドとして使用されるために必須です。 -->
+            android:permission="android.permission.BIND_INPUT_METHOD">
+
+            <!-- このインテントフィルターは、このサービスが「入力メソッド」であることをシステムに伝えます。 -->
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+
+            <!-- <meta-data> タグは、この入力メソッドの詳細な設定を
+                 記したXMLファイル（method.xml）の場所をシステムに伝えます。 -->
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/method" />
+        </service>
+        <!-- キーボード定義ここまで -->
+
+    </application>
+
+</manifest>
