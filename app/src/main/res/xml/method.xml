@@ -4,30 +4,28 @@
   私たちのキーボード（IME）がどのようなもので、どういった機能を持っているかを伝えます。
   AndroidManifest.xml の <meta-data> タグから参照されます。
 -->
+<!--
+  settingsActivity:
+  ユーザーがキーボードの設定を変更するための画面（Activity）を指定します。
+  ここには、辞書登録などを行うMainActivityを指定しています。
+  これにより、Androidの「設定」アプリのキーボード一覧から、
+  このアプリの設定画面に直接飛べるようになります。
+-->
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
-
-    <!--
-      settingsActivity:
-      ユーザーがキーボードの設定を変更するための画面（Activity）を指定します。
-      ここには、辞書登録などを行うMainActivityを指定しています。
-      これにより、Androidの「設定」アプリのキーボード一覧から、
-      このアプリの設定画面に直接飛べるようになります。
-    -->
     android:settingsActivity="keyboardcom.example.MainActivity">
 
     <!--
       subtype (サブタイプ):
       キーボードが対応する言語や入力モードを定義します。
       複数の言語に対応する場合は、<subtype> タグを複数記述します。
+      
+      label: Androidのキーボード切り替えダイアログに表示される名前です。
+      imeSubtypeLocale: このキーボードが対応する言語（ロケール）を指定します。"ja_JP"は日本語（日本）を表します。
+      imeSubtypeMode: 入力モードを指定します。"keyboard"は一般的な文字入力キーボードであることを示します。
     -->
     <subtype
-        <!-- label: Androidのキーボード切り替えダイアログに表示される名前です。 -->
         android:label="@string/app_name"
-
-        <!-- imeSubtypeLocale: このキーボードが対応する言語（ロケール）を指定します。"ja_JP"は日本語（日本）を表します。 -->
         android:imeSubtypeLocale="ja_JP"
-
-        <!-- imeSubtypeMode: 入力モードを指定します。"keyboard"は一般的な文字入力キーボードであることを示します。 -->
         android:imeSubtypeMode="keyboard" />
 
 </input-method>

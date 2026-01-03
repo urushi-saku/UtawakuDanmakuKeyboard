@@ -37,12 +37,12 @@
           ここからが、カスタムキーボード（IME）のための定義です。
           <service> タグを使って、InputMethodService を継承したクラスを
           「サービス」としてシステムに登録します。
+          BIND_INPUT_METHOD パーミッションは、このサービスが
+          システムにバインドされ、入力メソッドとして使用されるために必須です。
         -->
         <service
             android:name=".DanmakuInputMethodService"
             android:exported="true"
-            <!-- BIND_INPUT_METHOD パーミッションは、このサービスが
-                 システムにバインドされ、入力メソッドとして使用されるために必須です。 -->
             android:permission="android.permission.BIND_INPUT_METHOD">
 
             <!-- このインテントフィルターは、このサービスが「入力メソッド」であることをシステムに伝えます。 -->
