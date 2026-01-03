@@ -7,7 +7,6 @@
     android:fitsSystemWindows="true"
     tools:context=".WordListActivity">
 
-    <!-- 画面上部のタイトルバー領域 -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -20,14 +19,31 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- 単語リスト（タイトルバーの下に表示されるように設定） -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/word_recycler_view"
+    <!-- FrameLayoutを追加して、リストと空メッセージを重ねて表示できるようにする -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <!-- 新規単語追加ボタン -->
+        <!-- 単語リスト -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/word_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- リストが空の時に表示する案内メッセージ -->
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="まだ単語が登録されていません。\n右下の「+」ボタンから追加してください。"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            android:visibility="gone" /> <!-- 初期状態では非表示 -->
+
+    </FrameLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_word"
         android:layout_width="wrap_content"
