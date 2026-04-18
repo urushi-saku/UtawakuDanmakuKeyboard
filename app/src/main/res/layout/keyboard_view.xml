@@ -1,31 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  キーボードの全体的なレイアウトを定義します。
--->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="560dp"
-    android:orientation="horizontal"
-    android:baselineAligned="false">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="4dp">
 
-    <!-- 左ボタン -->
-    <Button
-        android:id="@+id/button_left"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:text="+"
-        android:textSize="24sp"
-        android:layout_margin="4dp"/>
+    <!-- 自動送信切り替えスイッチ (Material Components/AppCompatを使用) -->
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch_auto_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="自動送信モード(1秒間隔) "
+        android:textSize="16sp"
+        android:layout_marginBottom="4dp" />
 
-    <!-- 右ボタン -->
-    <Button
-        android:id="@+id/button_right"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:text="+"
-        android:textSize="24sp"
-        android:layout_margin="4dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
+        <!-- 左ボタン -->
+        <Button
+            android:id="@+id/button_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="+"
+            android:textSize="24sp"
+            android:layout_margin="4dp"/>
+
+        <!-- 右ボタン -->
+        <Button
+            android:id="@+id/button_right"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="+"
+            android:textSize="24sp"
+            android:layout_margin="4dp"/>
+
+    </LinearLayout>
 </LinearLayout>
