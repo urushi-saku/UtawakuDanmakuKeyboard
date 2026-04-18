@@ -11,7 +11,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
 import android.widget.Button
-import androidx.appcompat.widget.SwitchCompat
+import android.widget.Switch
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -28,7 +29,8 @@ class DanmakuInputMethodService : InputMethodService() {
 
     private lateinit var leftButton: Button
     private lateinit var rightButton: Button
-    private lateinit var autoSendSwitch: SwitchCompat
+    private lateinit var autoSendSwitch: Switch
+    private lateinit var autoSendStatusText: TextView
 
     private var spammingButton: Button? = null
     private var spammingWord: String? = null
@@ -42,6 +44,7 @@ class DanmakuInputMethodService : InputMethodService() {
         leftButton = keyboardView.findViewById(R.id.button_left)
         rightButton = keyboardView.findViewById(R.id.button_right)
         autoSendSwitch = keyboardView.findViewById(R.id.switch_auto_send)
+        autoSendStatusText = keyboardView.findViewById(R.id.text_auto_send_status)
 
         originalButtonBackground = leftButton.background
 
@@ -51,6 +54,22 @@ class DanmakuInputMethodService : InputMethodService() {
             insets
         }
 
+        // スイッチの初期状態に合わせてテキストを設定
+        updateSwitchText(autoSendSwitch.isChecked)
+
+        // スイッチの切り替えイベント
+        autoSendSwitch.setOnCheckedChangeListener { _, isChecked ->
+            updateSwitchText(isChecked)
+            
+            // スパム実行中なら、即座に次の間隔を反映させるために一度止めて再開（任意）
+            if (spammingButton != null && spammingWord != null) {
+                val currentButton = spammingButton!!
+                val currentWord = spammingWord!!
+                stopSpamMode()
+                startSpamMode(currentButton, currentWord)
+            }
+        }
+
         leftButton.setOnLongClickListener { handleLongClick(KEY_LEFT_WORD); true }
         rightButton.setOnLongClickListener { handleLongClick(KEY_RIGHT_WORD); true }
 
@@ -58,6 +77,16 @@ class DanmakuInputMethodService : InputMethodService() {
         rightButton.setOnClickListener { handleButtonClick(rightButton) }
 
         return keyboardView
+    }
+
+    private fun updateSwitchText(isChecked: Boolean) {
+        if (isChecked) {
+            autoSendStatusText.text = "自動送信モード(1.0s)"
+            autoSendStatusText.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
+        } else {
+            autoSendStatusText.text = "入力のみモード(手動)"
+            autoSendStatusText.setTextColor(ContextCompat.getColor(this, android.R.color.black))
+        }
     }
 
     private fun handleButtonClick(clickedButton: Button) {
@@ -82,7 +111,6 @@ class DanmakuInputMethodService : InputMethodService() {
                 val isAutoSend = autoSendSwitch.isChecked
                 checkAndProcessWord(isAutoSend)
                 
-                // モードに応じて待機時間を変える
                 val interval = if (isAutoSend) INTERVAL_AUTO_SEND_MS else INTERVAL_INPUT_ONLY_MS
                 spamHandler.postDelayed(this, interval)
             }
@@ -105,13 +133,10 @@ class DanmakuInputMethodService : InputMethodService() {
 
         val currentText = ic.getExtractedText(ExtractedTextRequest(), 0)?.text?.toString() ?: ""
 
-        // 入力欄が空、または既にその単語が入っている場合
         if (currentText.isEmpty() || currentText == wordToSend) {
             if (isAutoSend) {
-                // 自動送信モード：入力して送信
                 sendWordWithEnter(wordToSend)
             } else if (currentText.isEmpty()) {
-                // 入力のみモード：空のときだけ入力（送信はしない）
                 ic.commitText(wordToSend, 1)
             }
         }

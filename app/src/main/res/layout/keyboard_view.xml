@@ -3,43 +3,64 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="#DDDDDD"
     android:padding="4dp">
 
-    <!-- 自動送信切り替えスイッチ (Material Components/AppCompatを使用) -->
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switch_auto_send"
+    <!-- スイッチエリア -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="自動送信モード(1秒間隔) "
-        android:textSize="16sp"
-        android:layout_marginBottom="4dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp">
+
+        <!-- IDを追加 -->
+        <TextView
+            android:id="@+id/text_auto_send_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="入力のみ(手動)"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:layout_marginEnd="8dp"
+            android:textStyle="bold" />
+
+        <Switch
+            android:id="@+id/switch_auto_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="48dp"
+            android:minHeight="48dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="220dp"
         android:orientation="horizontal"
         android:baselineAligned="false">
 
-        <!-- 左ボタン -->
         <Button
             android:id="@+id/button_left"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="+"
-            android:textSize="24sp"
-            android:layout_margin="4dp"/>
+            android:textSize="18sp"
+            android:layout_margin="4dp"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="#000000"
+            android:textAllCaps="false"/>
 
-        <!-- 右ボタン -->
         <Button
             android:id="@+id/button_right"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="+"
-            android:textSize="24sp"
-            android:layout_margin="4dp"/>
-
+            android:textSize="18sp"
+            android:layout_margin="4dp"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="#000000"
+            android:textAllCaps="false"/>
     </LinearLayout>
 </LinearLayout>
