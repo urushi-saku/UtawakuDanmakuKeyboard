@@ -1,6 +1,5 @@
 package keyboardcom.example
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.inputmethodservice.InputMethodService
@@ -23,8 +22,8 @@ class DanmakuInputMethodService : InputMethodService() {
         const val PREFS_NAME = "DanmakuKeyboardPrefs"
         const val KEY_LEFT_WORD = "left_word"
         const val KEY_RIGHT_WORD = "right_word"
-        private const val INTERVAL_AUTO_SEND_MS = 1000L // 自動送信時は1秒
-        private const val INTERVAL_INPUT_ONLY_MS = 100L  // 入力のみ時は0.1秒で即装填
+        private const val INTERVAL_AUTO_SEND_MS = 1000L
+        private const val INTERVAL_INPUT_ONLY_MS = 100L
     }
 
     private lateinit var leftButton: Button
@@ -54,14 +53,9 @@ class DanmakuInputMethodService : InputMethodService() {
             insets
         }
 
-        // スイッチの初期状態に合わせてテキストを設定
         updateSwitchText(autoSendSwitch.isChecked)
-
-        // スイッチの切り替えイベント
         autoSendSwitch.setOnCheckedChangeListener { _, isChecked ->
             updateSwitchText(isChecked)
-            
-            // スパム実行中なら、即座に次の間隔を反映させるために一度止めて再開（任意）
             if (spammingButton != null && spammingWord != null) {
                 val currentButton = spammingButton!!
                 val currentWord = spammingWord!!
@@ -110,7 +104,6 @@ class DanmakuInputMethodService : InputMethodService() {
             override fun run() {
                 val isAutoSend = autoSendSwitch.isChecked
                 checkAndProcessWord(isAutoSend)
-                
                 val interval = if (isAutoSend) INTERVAL_AUTO_SEND_MS else INTERVAL_INPUT_ONLY_MS
                 spamHandler.postDelayed(this, interval)
             }
@@ -121,7 +114,6 @@ class DanmakuInputMethodService : InputMethodService() {
     private fun stopSpamMode() {
         spamRunnable?.let { spamHandler.removeCallbacks(it) }
         spamRunnable = null
-
         spammingButton?.background = originalButtonBackground
         spammingButton = null
         spammingWord = null
@@ -130,7 +122,6 @@ class DanmakuInputMethodService : InputMethodService() {
     private fun checkAndProcessWord(isAutoSend: Boolean) {
         val wordToSend = spammingWord ?: return
         val ic = currentInputConnection ?: return
-
         val currentText = ic.getExtractedText(ExtractedTextRequest(), 0)?.text?.toString() ?: ""
 
         if (currentText.isEmpty() || currentText == wordToSend) {
@@ -160,8 +151,8 @@ class DanmakuInputMethodService : InputMethodService() {
 
     private fun handleLongClick(buttonTarget: String) {
         stopSpamMode()
-        val intent = Intent()
-        intent.setClassName(this, "keyboardcom.example.WordListPickerActivity")
+        // WordListPickerActivity を呼び出すように修正
+        val intent = Intent(this, WordListPickerActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.putExtra("BUTTON_TARGET", buttonTarget)
         startActivity(intent)

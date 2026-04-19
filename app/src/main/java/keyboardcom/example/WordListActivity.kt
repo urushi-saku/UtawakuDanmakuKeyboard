@@ -15,19 +15,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import keyboardcom.example.databinding.ActivityWordListBinding
 import kotlinx.coroutines.launch
 
-/**
- * 単語リストの表示と管理を行うActivity。
- * このActivityは2つのモードで動作する。
- *
- * 1. 単語管理モード (通常起動):
- *    - アプリアイコンから直接起動された場合。
- *    - ツールバー、追加、削除、ヘルプ機能がすべて有効になる。
- *
- * 2. 単語選択モード (ピッカーとして起動):
- *    - キーボードから呼び出された場合 (`WordListPickerActivity`経由)。
- *    - ダイアログ風に表示され、単語を1つ選択してキーボードに返すことだけを目的とする。
- */
-class WordListActivity : AppCompatActivity() {
+// open を追加して WordListPickerActivity から継承できるようにする
+open class WordListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWordListBinding
     private lateinit var adapter: WordListAdapter
@@ -39,34 +28,33 @@ class WordListActivity : AppCompatActivity() {
         binding = ActivityWordListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // どのボタン（左 or 右）から呼び出されたかを示すIntent Extraを取得
         val buttonTarget = intent.getStringExtra("BUTTON_TARGET")
 
-        // buttonTargetがnullの場合、通常の「単語管理モード」として動作
-        if (buttonTarget == null) {
-            setSupportActionBar(binding.toolbar)
+        setSupportActionBar(binding.toolbar)
+        if (buttonTarget != null) {
+            title = "単語を選択"
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        } else {
             title = "単語の管理"
         }
 
-        // RecyclerViewのアダプターを初期化
         adapter = WordListAdapter(
-            // 単語がクリックされたときの処理
             onWordClick = { word ->
-                // 「単語選択モード」の場合のみ、クリック処理を実行
                 if (buttonTarget != null) {
-                    // 選択された単語をSharedPreferencesに保存
                     val prefs = getSharedPreferences(DanmakuInputMethodService.PREFS_NAME, Context.MODE_PRIVATE)
-                    prefs.edit().putString(buttonTarget, word).apply()
+                    val targetKey = if (buttonTarget == "left_word") {
+                        DanmakuInputMethodService.KEY_LEFT_WORD
+                    } else {
+                        DanmakuInputMethodService.KEY_RIGHT_WORD
+                    }
 
-                    // ユーザーにフィードバックを表示
-                    val buttonName = if (buttonTarget == DanmakuInputMethodService.KEY_LEFT_WORD) "左" else "右"
+                    prefs.edit().putString(targetKey, word).apply()
+
+                    val buttonName = if (buttonTarget == "left_word") "左" else "右"
                     Toast.makeText(this, "「$word」を${buttonName}ボタンに設定しました", Toast.LENGTH_SHORT).show()
-
-                    // 選択画面を閉じる
                     finish()
                 }
             },
-            // 単語が長押しされたときの処理（「単語管理モード」でのみ意味を持つ）
             onWordLongClick = { word ->
                 showDeleteConfirmDialog(word)
             }
@@ -75,39 +63,31 @@ class WordListActivity : AppCompatActivity() {
         binding.wordRecyclerView.adapter = adapter
         binding.wordRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // DataStoreから単語リストの変更を監視し、UIに反映する
         lifecycleScope.launch {
             wordRepository.words.collect { words ->
-                adapter.submitList(words) // リストの差分更新
-
-                // リストが空かどうかで、RecyclerViewと「空です」メッセージの表示を切り替える
+                adapter.submitList(words)
                 val isEmpty = words.isEmpty()
                 binding.wordRecyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
                 binding.emptyView.visibility = if (isEmpty) View.VISIBLE else View.GONE
             }
         }
 
-        // フローティングアクションボタン（単語追加）のクリックリスナー
         binding.fabAddWord.setOnClickListener {
             showAddWordDialog()
         }
     }
 
-    /**
-     * ツールバーにヘルプメニューを表示する。
-     */
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // 「単語選択モード」ではメニューを表示しない
-        if (intent.getStringExtra("BUTTON_TARGET") != null) {
-            return false
-        }
+        if (intent.getStringExtra("BUTTON_TARGET") != null) return false
         menuInflater.inflate(R.menu.word_list_menu, menu)
         return true
     }
 
-    /**
-     * ツールバーのメニュー項目がタップされたときの処理。
-     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_help -> {
@@ -118,28 +98,14 @@ class WordListActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 使い方を説明するヘルプダイアログを表示する。
-     */
     private fun showHelpDialog() {
         MaterialAlertDialogBuilder(this)
             .setTitle("使い方")
-            .setMessage(
-                "■ 単語をボタンに設定する方法\n"
-                        + "1. キーボードの「+」ボタンを長押しします。\n"
-                        + "2. この単語リストが表示されたら、設定したい単語をタップします。\n\n"
-                        + "■ 新しい単語を追加する方法\n"
-                        + "この画面の右下にある「+」ボタンから、新しい単語を追加できます。\n\n"
-                        + "■ 単語を削除する方法\n"
-                        + "この画面で、削除したい単語を長押ししてください。"
-            )
+            .setMessage("■ 設定方法\nキーボードの「+」を長押しして単語を選んでください。")
             .setPositiveButton("OK", null)
             .show()
     }
 
-    /**
-     * 新しい単語を追加するためのダイアログを表示する。
-     */
     private fun showAddWordDialog() {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_word, null)
         val editText = dialogView.findViewById<EditText>(R.id.edit_text_word)
@@ -151,26 +117,19 @@ class WordListActivity : AppCompatActivity() {
             .setPositiveButton("追加") { _, _ ->
                 val newWord = editText.text.toString()
                 if (newWord.isNotBlank()) {
-                    lifecycleScope.launch {
-                        wordRepository.addWord(newWord)
-                    }
+                    lifecycleScope.launch { wordRepository.addWord(newWord) }
                 }
             }
             .show()
     }
 
-    /**
-     * 単語を削除する前に確認ダイアログを表示する。
-     */
     private fun showDeleteConfirmDialog(word: String) {
         MaterialAlertDialogBuilder(this)
             .setTitle("単語の削除")
-            .setMessage("「$word」をリストから削除しますか？")
+            .setMessage("「$word」を削除しますか？")
             .setNegativeButton("キャンセル", null)
             .setPositiveButton("削除") { _, _ ->
-                lifecycleScope.launch {
-                    wordRepository.deleteWord(word)
-                }
+                lifecycleScope.launch { wordRepository.deleteWord(word) }
             }
             .show()
     }
